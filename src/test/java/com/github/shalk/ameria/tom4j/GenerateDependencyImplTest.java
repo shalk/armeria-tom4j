@@ -6,6 +6,7 @@ class GenerateDependencyImplTest {
 
   @org.junit.jupiter.api.Test
   void generate() {
-    System.out.println("hello");
+    String type = "implementation";
+    String lib = "libs.reactor.core";
   }
 }
