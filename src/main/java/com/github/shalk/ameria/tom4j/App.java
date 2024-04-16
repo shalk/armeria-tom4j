@@ -9,12 +9,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class App {
   public static void main(String[] args) throws IOException, URISyntaxException {
@@ -29,15 +26,37 @@ public class App {
     for (Map.Entry<String, Object> entry : entries) {
       versionMap.put(entry.getKey(), (String) entry.getValue());
     }
-    String value = result.getString("versions. asm");
-    System.out.println("value = " + value);
 
-    Set<String> resultKeys = result.dottedKeySet();
+    TomlTable libTable = result.getTable("libraries");
+
+    Set<String> resultKeys = libTable.keySet();
     for (String resultKey : resultKeys) {
-      if (resultKey.startsWith("libaries")) {
-        TomlTable table = result.getTable(resultKey);
-//        if(table.getString(""))
+      TomlTable table = libTable.getTable(resultKey);
+      String module = table.getString("module");
+      Dep dep = new Dep();
+      dep.setName(resultKey);
+      if (module != null) {
+        String[] split = module.split(":");
+        dep.setGroup(split[0]);
+        dep.setArtifact(split[1]);
       }
+      String versionRef = table.getString("version.ref");
+      if (versionRef != null) {
+        String x = versionMap.get(versionRef);
+        dep.setVersion(x);
+      }
+      Object o = table.get("exclusions");
+      if (o != null) {
+          if (o instanceof String) {
+            dep.getExcludes().add((String) o);
+          } else if (o instanceof TomlArray) {
+            TomlArray o1 = (TomlArray) o;
+            for (Object object : o1.toList()) {
+              dep.getExcludes().add((String) object);
+            }
+          }
+      }
+
     }
 
   }

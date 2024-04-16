@@ -2,6 +2,7 @@ package com.github.shalk.ameria.tom4j;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -12,6 +13,6 @@ public class Dep {
   private String artifact;
   private String version;
   private String scope;
-  private List<String> excludes;
+  private List<String> excludes = new ArrayList<>();
 
 }
