@@ -38,7 +38,9 @@ public class DepStoreImpl implements DepStore {
     Set<String> resultKeys = libTable.keySet();
     for (String resultKey : resultKeys) {
       Dep dep = new Dep();
-      lib.put(resultKey, dep);
+      String replaceKey = resultKey.replaceAll("_", ".");
+      replaceKey = resultKey.replaceAll("-",".");
+      lib.put("libs."+replaceKey, dep);
 
       TomlTable table = libTable.getTable(resultKey);
       String module = table.getString("module");
@@ -73,9 +75,9 @@ public class DepStoreImpl implements DepStore {
     Dep dep = lib.get(name);
     StringBuilder buffer = new StringBuilder();
     buffer.append("<dependency>").append("\n");
-    buffer.append("<groupId>org.junit.jupiter</groupId>").append("\n");
-    buffer.append("<artifactId>junit-jupiter</artifactId>").append("\n");
-    buffer.append("<version>5.8.1</version>").append("\n");
+    buffer.append("<groupId>").append(dep.getGroup()).append("</groupId>").append("\n");
+    buffer.append("<artifactId>").append(dep.getArtifact()).append("</artifactId>").append("\n");
+    buffer.append("<version>").append(dep.getVersion()).append("</version>").append("\n");
     if (dep.getScope() != null) {
       buffer.append("<scope>").append(dep.getScope()).append("</scope>").append("\n");
     }
