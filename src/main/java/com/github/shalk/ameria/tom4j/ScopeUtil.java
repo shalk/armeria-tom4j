@@ -10,7 +10,10 @@ public class ScopeUtil {
     map.put("testImplementation", "test");
     map.put("runtimeOnly", "runtime");
     map.put("compileOnly", "compile");
-//    map.put("Implementation", null);
+    map.put("Implementation", "compile");
+  }
 
+  public String getScope(String type) {
+    return map.get(type);
   }
 }

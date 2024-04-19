@@ -1,12 +1,11 @@
 package com.github.shalk.ameria.tom4j;
 
+import lombok.SneakyThrows;
 import org.tomlj.Toml;
 import org.tomlj.TomlArray;
 import org.tomlj.TomlParseResult;
 import org.tomlj.TomlTable;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -18,8 +17,9 @@ public class DepStoreImpl implements DepStore {
   Map<String, String> versionMap;
   Map<String, Dep> lib;
 
+  @SneakyThrows
 
-  public DepStoreImpl() throws IOException, URISyntaxException {
+  public DepStoreImpl()  {
     String resourceName = "dependencies.toml";
     Path source = Paths.get(ClassLoader.getSystemResource(resourceName).toURI());
     result = Toml.parse(source);
@@ -73,6 +73,14 @@ public class DepStoreImpl implements DepStore {
   @Override
   public String getName(String name) {
     Dep dep = lib.get(name);
+    return depToString(dep);
+  }
+
+  @Override
+  public Dep getDepByName(String name) {
+    return lib.get(name);
+  }
+  private static String depToString(Dep dep) {
     StringBuilder buffer = new StringBuilder();
     buffer.append("<dependency>").append("\n");
     buffer.append("<groupId>").append(dep.getGroup()).append("</groupId>").append("\n");
