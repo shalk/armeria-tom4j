@@ -1,4 +1,4 @@
-package com.github.shalk.ameria.tom4j;
+package com.github.shalk.armeria.tom4j;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

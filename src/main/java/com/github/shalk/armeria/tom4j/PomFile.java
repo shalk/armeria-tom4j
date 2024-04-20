@@ -1,9 +1,8 @@
-package com.github.shalk.ameria.tom4j;
+package com.github.shalk.armeria.tom4j;
 
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 
 @Data

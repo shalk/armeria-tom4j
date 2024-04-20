@@ -1,11 +1,11 @@
-package com.github.shalk.ameria.tom4j;
+package com.github.shalk.armeria.tom4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ScopeUtil {
 
-  public Map<String,String> map;
+  public Map<String, String> map;
 
   public ScopeUtil() {
     map = new HashMap<>();

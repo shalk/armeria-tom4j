@@ -1,20 +1,12 @@
-package com.github.shalk.ameria.tom4j;
+package com.github.shalk.armeria.tom4j;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Function;
 
-public class PomFileGenManager {
-  public static List<String> gen(List<PomFile> pomFiles) {
-    List<String> ret = new ArrayList<>();
-    for (PomFile pomFile : pomFiles) {
-      ret.add(toStr(pomFile));
-    }
-    return ret;
-  }
+public class PomFileContentGenerator implements Function<PomFile, String> {
 
-  private static String toStr(PomFile pomFile) {
+
+  public String apply(PomFile pomFile) {
     StringBuilder builder = new StringBuilder();
     builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" +
@@ -22,9 +14,9 @@ public class PomFileGenManager {
         "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
         "    <modelVersion>4.0.0</modelVersion>\n" +
         "\n" +
-        "    <groupId>"+ pomFile.getG() +"</groupId>\n" +
-        "    <artifactId>"+pomFile.getA()+ "</artifactId>\n" +
-        "    <version>"+pomFile.getV()+"</version>\n" +
+        "    <groupId>" + pomFile.getG() + "</groupId>\n" +
+        "    <artifactId>" + pomFile.getA() + "</artifactId>\n" +
+        "    <version>" + pomFile.getV() + "</version>\n" +
         "\n" +
         "    <properties>\n" +
         "        <maven.compiler.source>17</maven.compiler.source>\n" +

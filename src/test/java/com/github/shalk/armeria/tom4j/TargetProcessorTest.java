@@ -1,4 +1,4 @@
-package com.github.shalk.ameria.tom4j;
+package com.github.shalk.armeria.tom4j;
 
 import org.junit.jupiter.api.Test;
 

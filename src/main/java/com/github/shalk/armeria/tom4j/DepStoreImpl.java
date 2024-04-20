@@ -1,4 +1,4 @@
-package com.github.shalk.ameria.tom4j;
+package com.github.shalk.armeria.tom4j;
 
 import lombok.SneakyThrows;
 import org.tomlj.Toml;
@@ -6,7 +6,7 @@ import org.tomlj.TomlArray;
 import org.tomlj.TomlParseResult;
 import org.tomlj.TomlTable;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -21,8 +21,9 @@ public class DepStoreImpl implements DepStore {
 
   @SneakyThrows
 
-  public DepStoreImpl() {
-    this.result = Toml.parse(Paths.get(ClassLoader.getSystemResource("dependencies.toml").toURI()));
+  public DepStoreImpl(Path file) {
+
+    this.result = Toml.parse(file);
     this.versionMap = new HashMap<>();
     this.lib = new HashMap<>();
     this.bomMap = new HashMap<>();
