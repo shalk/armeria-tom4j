@@ -5,13 +5,12 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class DepStoreImplTest {
   @Test
   public void test() throws IOException, URISyntaxException {
     DepStoreImpl depStore = new DepStoreImpl();
-    String name = depStore.getName("libs.assertj");
+    Dep dep = depStore.getDep("libs.assertj");
+    String name = DepUtil.depToString(dep);
     System.out.println("name = " + name);
   }
 

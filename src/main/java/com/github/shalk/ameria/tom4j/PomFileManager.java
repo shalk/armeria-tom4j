@@ -1,22 +1,23 @@
 package com.github.shalk.ameria.tom4j;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class PomFileManager {
 
   private static ScopeUtil scopeUtil = new ScopeUtil();
   private static DepStore depStore = new DepStoreImpl();
 
-  public PomFileManager() throws IOException, URISyntaxException {
+  public PomFileManager() {
   }
 
   public static List<PomFile> parse(List<GradleFile> gradleFiles) {
-    return gradleFiles.stream().map(k -> trans(k)).collect(Collectors.toList());
+    List<PomFile> ret = new ArrayList<>();
+    for (GradleFile gradleFile : gradleFiles) {
+      ret.add(trans(gradleFile));
+    }
+    return ret;
   }
 
   private static PomFile trans(GradleFile k) {
@@ -26,18 +27,29 @@ public class PomFileManager {
     pomFile.setG("com.linecorp.armeria");
     pomFile.setA(getA(filename));
     pomFile.setV("1.0.0-SNAPSHOT");
-    List<Dep> depMap = new ArrayList<>();
-    Map<String, String> dep = k.getDep();
-    for (Map.Entry<String, String> entry : dep.entrySet()) {
-      String lib = entry.getKey();
-      String type = entry.getValue();
-      scopeUtil.getScope(type);
-      depStore.getDepByName(lib);
-    }
-    pomFile.setDep(depMap);
+    pomFile.setDep(getDeps(k));
+    return pomFile;
   }
 
-  private static String getA(String filename) {
-    return null;
+  private static List<Dep> getDeps(GradleFile k) {
+    List<Dep> depList = new ArrayList<>();
+    Map<String, String> depMap = k.getDep();
+    for (Map.Entry<String, String> entry : depMap.entrySet()) {
+      String lib = entry.getKey();
+      String type = entry.getValue();
+      Dep dep = depStore.getDep(lib);
+      dep.setScope(scopeUtil.getScope(type));
+      depList.add(dep);
+    }
+    return depList;
+  }
+
+  static String getA(String filename) {
+    int index = filename.indexOf("examples");
+    String sub = filename.substring(index + "examples".length());
+    int end = sub.lastIndexOf("/");
+    String mid = sub.substring(0, end);
+    String replace = mid.replace("/", "-");
+    return "example" + replace;
   }
 }

@@ -11,4 +11,6 @@ public class GradleFile {
   private String filename;
   private Map<String, String> dep = new HashMap<>();
 
+  private String exec;
+
 }

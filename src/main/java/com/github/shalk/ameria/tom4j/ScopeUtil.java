@@ -1,5 +1,6 @@
 package com.github.shalk.ameria.tom4j;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ScopeUtil {
@@ -7,6 +8,7 @@ public class ScopeUtil {
   public Map<String,String> map;
 
   public ScopeUtil() {
+    map = new HashMap<>();
     map.put("testImplementation", "test");
     map.put("runtimeOnly", "runtime");
     map.put("compileOnly", "compile");

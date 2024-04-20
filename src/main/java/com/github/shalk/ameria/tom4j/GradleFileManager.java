@@ -9,8 +9,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GradleFileManager {
-  static String rex = "^\\s*(implementation|runtimeOnly|Implementation|compileOnly)\\s+(\\S+)";
+  static String rex = "^\\s*(implementation|runtimeOnly|testImplementation|compileOnly)\\s+(\\S+)";
+  static String rex2 = "^\\s*(implementation|runtimeOnly|testImplementation|compileOnly)\\((\\S+)\\)";
+
   static Pattern p = Pattern.compile(rex);
+  static Pattern p2 = Pattern.compile(rex2);
   static List<GradleFile> getGradleFile(List<Path> paths) throws IOException {
     List<GradleFile> gradleFiles = new ArrayList<>();
     for (Path path : paths) {
@@ -24,7 +27,15 @@ public class GradleFileManager {
           String group2 = matcher.group(2);
           file.getDep().put(group2, group1);
         }
+        Matcher matcher2 = p2.matcher(line);
+        if (matcher2.matches()) {
+          String group1 = matcher2.group(1);
+          String group2 = matcher2.group(2);
+          file.getDep().put(group2, group1);
+        }
+
       }
+      gradleFiles.add(file);
     }
     return gradleFiles;
 

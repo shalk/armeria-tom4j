@@ -6,7 +6,6 @@ import org.tomlj.TomlArray;
 import org.tomlj.TomlParseResult;
 import org.tomlj.TomlTable;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,30 +16,44 @@ public class DepStoreImpl implements DepStore {
   Map<String, String> versionMap;
   Map<String, Dep> lib;
 
+  // key is groupId, value is versionRefKey
+  Map<String, String> bomMap;
+
   @SneakyThrows
 
-  public DepStoreImpl()  {
-    String resourceName = "dependencies.toml";
-    Path source = Paths.get(ClassLoader.getSystemResource(resourceName).toURI());
-    result = Toml.parse(source);
-//    result.errors().forEach(error -> System.err.println(error.toString()));
+  public DepStoreImpl() {
+    this.result = Toml.parse(Paths.get(ClassLoader.getSystemResource("dependencies.toml").toURI()));
+    this.versionMap = new HashMap<>();
+    this.lib = new HashMap<>();
+    this.bomMap = new HashMap<>();
+    init();
+  }
 
+  public void init() {
+    // init versionMap
     TomlTable versions = result.getTable("versions");
     Set<Map.Entry<String, Object>> entries = versions.dottedEntrySet();
-    this.versionMap = new HashMap<>();
     for (Map.Entry<String, Object> entry : entries) {
       versionMap.put(entry.getKey(), (String) entry.getValue());
     }
+    TomlTable bomTable = result.getTable("boms");
+    Set<String> bomKeys = bomTable.keySet();
+    for (String bomKey : bomKeys) {
+      TomlTable table = bomTable.getTable(bomKey);
+      String module = table.getString("module");
+      String versionRef = table.getString("version.ref");
+      String groupId = module.split(":")[0];
+      bomMap.put(groupId, versionRef);
+    }
 
-    lib = new HashMap<>();
+
+    // init depMap
     TomlTable libTable = result.getTable("libraries");
-
     Set<String> resultKeys = libTable.keySet();
     for (String resultKey : resultKeys) {
       Dep dep = new Dep();
-      String replaceKey = resultKey.replaceAll("_", ".");
-      replaceKey = resultKey.replaceAll("-",".");
-      lib.put("libs."+replaceKey, dep);
+      String replaceKey = resultKey.replaceAll("_", ".").replaceAll("-", ".");
+      lib.put("libs." + replaceKey, dep);
 
       TomlTable table = libTable.getTable(resultKey);
       String module = table.getString("module");
@@ -50,10 +63,25 @@ public class DepStoreImpl implements DepStore {
         dep.setGroup(split[0]);
         dep.setArtifact(split[1]);
       }
-      String versionRef = table.getString("version.ref");
-      if (versionRef != null) {
-        String x = versionMap.get(versionRef);
-        dep.setVersion(x);
+      // handle version
+      if (table.isString("version")) {
+        dep.setVersion(table.getString("version"));
+      } else {
+        String versionRef = table.getString("version.ref");
+        if (versionRef != null) {
+          String x = versionMap.get(versionRef);
+          dep.setVersion(x);
+        } else if (inBom(dep)) {
+          for (String groupId : bomMap.keySet()) {
+            if (dep.getGroup().equals(groupId) || dep.getGroup().startsWith(groupId + ".")) {
+              String bomVersionRef = bomMap.get(groupId);
+              dep.setVersion(versionMap.get(bomVersionRef));
+              break;
+            }
+          }
+        } else {
+          throw new RuntimeException("can not find version for " + resultKey);
+        }
       }
       Object o = table.get("exclusions");
       if (o != null) {
@@ -67,40 +95,61 @@ public class DepStoreImpl implements DepStore {
         }
       }
     }
+  }
 
+  private boolean inBom(Dep dep) {
+    boolean found = false;
+    for (String groupId : bomMap.keySet()) {
+      if (dep.getGroup().equals(groupId) || dep.getGroup().startsWith(groupId + ".")) {
+        found = true;
+        break;
+      }
+    }
+    return found;
   }
 
   @Override
-  public String getName(String name) {
-    Dep dep = lib.get(name);
-    return depToString(dep);
+  public Dep getDep(String name) {
+    Dep dep1 = getDep1(name);
+    if (dep1 == null) {
+      throw new RuntimeException("can not handle dep " + name);
+    }
+    return dep1;
   }
 
-  @Override
-  public Dep getDepByName(String name) {
+  private Dep getDep1(String name) {
+    if (name.startsWith("libs")) {
+      return getDepByLibName(name);
+    } else if (name.startsWith("project")) {
+      return getDepByProjectName(name);
+    } else if (name.startsWith("kotlin")) {
+      return getDepByKotlinName(name);
+    } else {
+      throw new RuntimeException("unkown dep type name");
+    }
+  }
+
+  public Dep getDepByLibName(String name) {
     return lib.get(name);
   }
-  private static String depToString(Dep dep) {
-    StringBuilder buffer = new StringBuilder();
-    buffer.append("<dependency>").append("\n");
-    buffer.append("<groupId>").append(dep.getGroup()).append("</groupId>").append("\n");
-    buffer.append("<artifactId>").append(dep.getArtifact()).append("</artifactId>").append("\n");
-    buffer.append("<version>").append(dep.getVersion()).append("</version>").append("\n");
-    if (dep.getScope() != null) {
-      buffer.append("<scope>").append(dep.getScope()).append("</scope>").append("\n");
-    }
-    if (!dep.getExcludes().isEmpty()) {
-      buffer.append("<exclusions>\n");
-      for (String exclude : dep.getExcludes()) {
-        String[] split = exclude.split(":");
-        buffer.append(" <exclusion>\n");
-        buffer.append("<groupId>").append(split[0]).append("</groupId>").append("\n");
-        buffer.append("<artifactId>").append(split[1]).append("</artifactId>").append("\n");
-        buffer.append(" </exclusion>\n");
-      }
-      buffer.append("</exclusions>\n");
-    }
-    buffer.append("</dependency>").append("\n");
-    return buffer.toString();
+
+  public Dep getDepByProjectName(String project) {
+    Dep dep = new Dep();
+    String projectName = "armeria" +
+        project.replaceAll("project\\(", "")
+            .replaceAll("\\)", "")
+            .replaceAll(":", "-")
+            .replaceAll("['\"]", "");
+    dep.setArtifact(projectName);
+    dep.setGroup("com.linecorp.armeria");
+    dep.setVersion(ArmeriaVersion.version);
+    return dep;
+  }
+
+  public Dep getDepByKotlinName(String project) {
+    String libName = "libs.kotlin." + project.replaceAll("kotlin\\(\"", "")
+        .replaceAll("\"\\)", "")
+        .replaceAll("-", ".");
+    return lib.get(libName);
   }
 }
