@@ -15,6 +15,9 @@ public class PomFile {
 
   private List<Dep> dep;
 
+  private List<String> plugin;
+  private List<String> extension;
+
   private String execMain;
 
 }
