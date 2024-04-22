@@ -142,6 +142,9 @@ public class DepStoreImpl implements DepStore {
             .replaceAll(":", "-")
             .replaceAll("['\"]", "");
     dep.setArtifact(projectName);
+    if (dep.getArtifact().equals("armeria-core")) {
+      dep.setArtifact("armeria");
+    }
     dep.setGroup("com.linecorp.armeria");
     dep.setVersion(ArmeriaVersion.version);
     return dep;
