@@ -1,11 +1,11 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class TargetProcessorTest {
 

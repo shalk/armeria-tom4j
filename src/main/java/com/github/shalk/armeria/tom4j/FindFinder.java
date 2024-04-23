@@ -1,3 +1,4 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
 
 import java.io.IOException;
@@ -12,14 +13,17 @@ import java.util.stream.Stream;
 
 public class FindFinder {
 
-
   List<Path> getGradleList(String path) throws IOException {
-    Stream<Path> pathStream = Files.find(Paths.get(path), 10, new BiPredicate<Path, BasicFileAttributes>() {
-      @Override
-      public boolean test(Path path, BasicFileAttributes basicFileAttributes) {
-        return path.endsWith("build.gradle") || path.endsWith("build.gradle.kts");
-      }
-    });
+    Stream<Path> pathStream =
+        Files.find(
+            Paths.get(path),
+            10,
+            new BiPredicate<Path, BasicFileAttributes>() {
+              @Override
+              public boolean test(Path path, BasicFileAttributes basicFileAttributes) {
+                return path.endsWith("build.gradle") || path.endsWith("build.gradle.kts");
+              }
+            });
     return pathStream.collect(Collectors.toList());
   }
 }

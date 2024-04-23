@@ -1,15 +1,15 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
-
-import lombok.SneakyThrows;
-import org.tomlj.Toml;
-import org.tomlj.TomlArray;
-import org.tomlj.TomlParseResult;
-import org.tomlj.TomlTable;
 
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import lombok.SneakyThrows;
+import org.tomlj.Toml;
+import org.tomlj.TomlArray;
+import org.tomlj.TomlParseResult;
+import org.tomlj.TomlTable;
 
 public class DepStoreImpl implements DepStore {
   TomlParseResult result;
@@ -20,7 +20,6 @@ public class DepStoreImpl implements DepStore {
   Map<String, String> bomMap;
 
   @SneakyThrows
-
   public DepStoreImpl(Path file) {
 
     this.result = Toml.parse(file);
@@ -46,7 +45,6 @@ public class DepStoreImpl implements DepStore {
       String groupId = module.split(":")[0];
       bomMap.put(groupId, versionRef);
     }
-
 
     // init depMap
     TomlTable libTable = result.getTable("libraries");
@@ -136,11 +134,13 @@ public class DepStoreImpl implements DepStore {
 
   public Dep getDepByProjectName(String project) {
     Dep dep = new Dep();
-    String projectName = "armeria" +
-        project.replaceAll("project\\(", "")
-            .replaceAll("\\)", "")
-            .replaceAll(":", "-")
-            .replaceAll("['\"]", "");
+    String projectName =
+        "armeria"
+            + project
+                .replaceAll("project\\(", "")
+                .replaceAll("\\)", "")
+                .replaceAll(":", "-")
+                .replaceAll("['\"]", "");
     dep.setArtifact(projectName);
     if (dep.getArtifact().equals("armeria-core")) {
       dep.setArtifact("armeria");
@@ -151,9 +151,9 @@ public class DepStoreImpl implements DepStore {
   }
 
   public Dep getDepByKotlinName(String project) {
-    String libName = "libs.kotlin." + project.replaceAll("kotlin\\(\"", "")
-        .replaceAll("\"\\)", "")
-        .replaceAll("-", ".");
+    String libName =
+        "libs.kotlin."
+            + project.replaceAll("kotlin\\(\"", "").replaceAll("\"\\)", "").replaceAll("-", ".");
     return lib.get(libName);
   }
 }

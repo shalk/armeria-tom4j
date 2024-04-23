@@ -1,5 +1,5 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
-
 
 public class DepUtil {
   public static String depToString(Dep dep) {

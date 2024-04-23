@@ -1,11 +1,11 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
-
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.jupiter.api.Test;
 
 class DepStoreImplTest {
   @Test
@@ -16,5 +16,4 @@ class DepStoreImplTest {
     String name = DepUtil.depToString(dep);
     System.out.println("name = " + name);
   }
-
 }

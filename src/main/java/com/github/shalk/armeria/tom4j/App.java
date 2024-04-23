@@ -1,3 +1,4 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
 
 import java.io.IOException;
@@ -31,19 +32,19 @@ public class App {
       // read file to as Pojo GradleFile
       GradleFileReader gradleFileReader = new GradleFileReader();
       // convert  GradleFile to PomFile
-      ConvertGradleFileToPomFile convertGradleFileToPomFile = new ConvertGradleFileToPomFile(depstore);
+      ConvertGradleFileToPomFile convertGradleFileToPomFile =
+          new ConvertGradleFileToPomFile(depstore);
       // generate pom.xml from pomFile
       PomFileContentGenerator pomFileContentGenerator = new PomFileContentGenerator();
-      String pomFileContent = gradleFileReader
-          .andThen(convertGradleFileToPomFile)
-          .andThen(pomFileContentGenerator)
-          .apply(gradleFilePath);
+      String pomFileContent =
+          gradleFileReader
+              .andThen(convertGradleFileToPomFile)
+              .andThen(pomFileContentGenerator)
+              .apply(gradleFilePath);
 
       // write to  pom.xml
       Path pomFilePath = new TargetProcessor().apply(gradleFilePath);
       Files.write(pomFilePath, pomFileContent.getBytes(StandardCharsets.UTF_8));
     }
-
-
   }
 }

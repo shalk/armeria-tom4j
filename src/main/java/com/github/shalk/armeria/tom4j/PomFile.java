@@ -1,9 +1,8 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
 
-import lombok.Data;
-
 import java.util.List;
-
+import lombok.Data;
 
 @Data
 public class PomFile {
@@ -19,5 +18,4 @@ public class PomFile {
   private List<String> extension;
 
   private String execMain;
-
 }

@@ -1,10 +1,9 @@
+/* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
-
-import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.Data;
 
 @Data
 public class Dep {
@@ -14,5 +13,4 @@ public class Dep {
   private String version;
   private String scope;
   private List<String> excludes = new ArrayList<>();
-
 }
