@@ -13,7 +13,7 @@ public class PluginUtil {
 
   public static List<String> getPlugin(String name) {
     try {
-      URL url = PluginUtil.class.getResource("plugin-" + name + ".xml");
+      URL url = PluginUtil.class.getClassLoader().getResource("plugin-" + name + ".xml");
       Path path = Paths.get(url.toURI());
       return Files.readAllLines(path, StandardCharsets.UTF_8);
     } catch (Exception e) {

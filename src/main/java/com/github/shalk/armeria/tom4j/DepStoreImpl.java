@@ -116,6 +116,11 @@ public class DepStoreImpl implements DepStore {
     return dep1;
   }
 
+  @Override
+  public String getVersion(String name) {
+    return versionMap.get(name);
+  }
+
   private Dep getDep1(String name) {
     if (name.startsWith("libs")) {
       return getDepByLibName(name);

@@ -13,7 +13,7 @@ public class ExtUtil {
 
   public static List<String> getExt(String name) {
     try {
-      URL url = ExtUtil.class.getResource("ext-" + name + ".xml");
+      URL url = ExtUtil.class.getClassLoader().getResource("ext-" + name + ".xml");
       Path path = Paths.get(url.toURI());
       return Files.readAllLines(path, StandardCharsets.UTF_8);
     } catch (Exception e) {

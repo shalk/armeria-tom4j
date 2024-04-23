@@ -4,6 +4,7 @@
   <version>0.1.11</version>
   <configuration>
     <thriftExecutable>thrift</thriftExecutable>
+    <generator>java</generator>
   </configuration>
   <executions>
     <execution>

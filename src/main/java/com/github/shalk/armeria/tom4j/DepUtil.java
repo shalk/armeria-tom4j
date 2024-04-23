@@ -25,4 +25,13 @@ public class DepUtil {
     buffer.append("</dependency>").append("\n");
     return buffer.toString();
   }
+
+  public static Dep genDaggerCompiler(String version) {
+    Dep dep = new Dep();
+    dep.setVersion(version);
+    dep.setGroup("com.google.dagger");
+    dep.setArtifact("dagger-compiler");
+    dep.setScope("provided");
+    return dep;
+  }
 }

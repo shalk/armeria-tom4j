@@ -2,9 +2,14 @@
 package com.github.shalk.armeria.tom4j;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class PomFileContentGenerator implements Function<PomFile, String> {
+
+  public String combine(String tag, String content) {
+    return "<" + tag + ">" + content + "</" + tag + ">\n";
+  }
 
   public String apply(PomFile pomFile) {
     StringBuilder builder = new StringBuilder();
@@ -14,22 +19,23 @@ public class PomFileContentGenerator implements Function<PomFile, String> {
             + "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
             + "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
             + "    <modelVersion>4.0.0</modelVersion>\n"
-            + "\n"
-            + "    <groupId>"
-            + pomFile.getG()
-            + "</groupId>\n"
-            + "    <artifactId>"
-            + pomFile.getA()
-            + "</artifactId>\n"
-            + "    <version>"
-            + pomFile.getV()
-            + "</version>\n"
-            + "\n"
-            + "    <properties>\n"
-            + "        <maven.compiler.source>17</maven.compiler.source>\n"
-            + "        <maven.compiler.target>17</maven.compiler.target>\n"
-            + "        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\n"
-            + "    </properties>\n");
+            + "\n");
+    // gav
+    builder.append(combine("groupId", pomFile.getG()));
+    builder.append(combine("artifactId", pomFile.getA()));
+    builder.append(combine("version", pomFile.getV()));
+    // properties
+    builder.append("    <properties>\n");
+    builder.append(combine("maven.compiler.source", "17"));
+    builder.append(combine("maven.compiler.target", "17"));
+    builder.append(combine("project.build.sourceEncoding", "UTF-8"));
+    Map<String, String> properties = pomFile.getProperties();
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      builder.append(combine(entry.getKey(), entry.getValue()));
+    }
+    builder.append("    </properties>\n");
+
+    // deps
     builder.append("    <dependencies>\n");
     List<Dep> deps = pomFile.getDep();
     for (Dep dep : deps) {
@@ -59,7 +65,6 @@ public class PomFileContentGenerator implements Function<PomFile, String> {
     }
 
     builder.append("</build>\n");
-
     builder.append("</project>");
     return builder.toString();
   }

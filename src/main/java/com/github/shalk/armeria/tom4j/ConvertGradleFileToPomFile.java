@@ -31,7 +31,26 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
     pomFile.setG("com.linecorp.armeria");
     pomFile.setA(getA(filename));
     pomFile.setV("1.0.0-SNAPSHOT");
-    pomFile.setDep(getDeps(k));
+    List<Dep> deps = getDeps(k);
+
+    // deps corner case
+    if (pomFile.getA().contains("dagger")) {
+      deps.add(DepUtil.genDaggerCompiler(depStore.getVersion("dagger")));
+    }
+    pomFile.setDep(deps);
+
+    if (pomFile.getA().contains("grpc")) {
+      pomFile.getPlugin().add("grpc");
+      pomFile.getExtension().add("os");
+      String grpcJavaVersion = depStore.getVersion("grpc-java");
+      pomFile.getProperties().put("dep.grpc-java.version", grpcJavaVersion);
+
+      String protobufVersion = depStore.getVersion("protobuf");
+      pomFile.getProperties().put("dep.protobuf.version", protobufVersion);
+    }
+    if (pomFile.getA().contains("thrift")) {
+      pomFile.getPlugin().add("thrift");
+    }
     return pomFile;
   }
 
@@ -45,6 +64,7 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
       dep.setScope(scopeUtil.getScope(type));
       depList.add(dep);
     }
+
     return depList;
   }
 }
