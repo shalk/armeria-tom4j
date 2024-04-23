@@ -13,7 +13,7 @@ class DepStoreImplTest {
     Path path = Paths.get(ClassLoader.getSystemResource("dependencies.toml").toURI());
     DepStoreImpl depStore = new DepStoreImpl(path);
     Dep dep = depStore.getDep("libs.assertj");
-    String name = DepUtil.depToString(dep);
+    String name = new PomFileContentGenerator().depToString(dep);
     System.out.println("name = " + name);
   }
 }

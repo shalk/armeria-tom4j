@@ -1,11 +1,49 @@
 /* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
 
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public class PomFileContentGenerator implements Function<PomFile, String> {
+
+  public String depToString(Dep dep) {
+    StringBuilder buffer = new StringBuilder();
+    buffer.append(head("dependency"));
+    buffer.append(combine("groupId", dep.getGroup()));
+    buffer.append(combine("artifactId", dep.getArtifact()));
+    buffer.append(combine("version", dep.getVersion()));
+    if (dep.getScope() != null) {
+      buffer.append(combine("scope", dep.getScope()));
+    }
+    if (!dep.getExcludes().isEmpty()) {
+      buffer.append("<exclusions>\n");
+      for (String exclude : dep.getExcludes()) {
+        String[] split = exclude.split(":");
+        buffer.append(" <exclusion>\n");
+        buffer.append(combine("groupId", split[0]));
+        buffer.append(combine("artifactId", split[1]));
+        buffer.append(" </exclusion>\n");
+      }
+      buffer.append("</exclusions>\n");
+    }
+    buffer.append(tail("dependency"));
+    return buffer.toString();
+  }
+
+  public String head(String tag) {
+    return "<" + tag + ">\n";
+  }
+
+  public String tail(String tag) {
+    return "</" + tag + ">\n";
+  }
 
   public String combine(String tag, String content) {
     return "<" + tag + ">" + content + "</" + tag + ">\n";
@@ -39,7 +77,7 @@ public class PomFileContentGenerator implements Function<PomFile, String> {
     builder.append("    <dependencies>\n");
     List<Dep> deps = pomFile.getDep();
     for (Dep dep : deps) {
-      builder.append(DepUtil.depToString(dep));
+      builder.append(depToString(dep));
     }
 
     builder.append("    </dependencies>\n");
@@ -67,5 +105,33 @@ public class PomFileContentGenerator implements Function<PomFile, String> {
     builder.append("</build>\n");
     builder.append("</project>");
     return builder.toString();
+  }
+}
+
+class ExtUtil {
+
+  public static List<String> getExt(String name) {
+    try {
+      URL url = ExtUtil.class.getClassLoader().getResource("ext-" + name + ".xml");
+      Path path = Paths.get(url.toURI());
+      return Files.readAllLines(path, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return new ArrayList<>();
+    }
+  }
+}
+
+class PluginUtil {
+
+  public static List<String> getPlugin(String name) {
+    try {
+      URL url = PluginUtil.class.getClassLoader().getResource("plugin-" + name + ".xml");
+      Path path = Paths.get(url.toURI());
+      return Files.readAllLines(path, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return new ArrayList<>();
+    }
   }
 }

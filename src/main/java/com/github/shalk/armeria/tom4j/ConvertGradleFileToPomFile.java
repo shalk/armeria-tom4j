@@ -2,13 +2,14 @@
 package com.github.shalk.armeria.tom4j;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile> {
 
-  private static final ScopeUtil scopeUtil = new ScopeUtil();
+  private final ScopeUtil scopeUtil = new ScopeUtil();
   private final DepStore depStore;
 
   public ConvertGradleFileToPomFile(DepStore depStore) {
@@ -35,10 +36,27 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
 
     // deps corner case
     if (pomFile.getA().contains("dagger")) {
-      deps.add(DepUtil.genDaggerCompiler(depStore.getVersion("dagger")));
+      String version = depStore.getVersion("dagger");
+      Dep dep = new Dep();
+      dep.setVersion(version);
+      dep.setGroup("com.google.dagger");
+      dep.setArtifact("dagger-compiler");
+      dep.setScope("provided");
+      deps.add(dep);
     }
+    if (pomFile.getA().contains("spring-boot-jetty")) {
+      String version = depStore.getVersion("spring-boot3");
+      Dep dep = new Dep();
+      dep.setVersion(version);
+      dep.setGroup("org.springframework.boot");
+      dep.setArtifact("spring-boot-starter-web");
+      dep.getExcludes().add("org.springframework.boot:spring-boot-starter-tomcat");
+      deps.add(dep);
+    }
+
     pomFile.setDep(deps);
 
+    // plugin corner case
     if (pomFile.getA().contains("grpc")) {
       pomFile.getPlugin().add("grpc");
       pomFile.getExtension().add("os");
@@ -48,9 +66,11 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
       String protobufVersion = depStore.getVersion("protobuf");
       pomFile.getProperties().put("dep.protobuf.version", protobufVersion);
     }
+
     if (pomFile.getA().contains("thrift")) {
       pomFile.getPlugin().add("thrift");
     }
+
     return pomFile;
   }
 
@@ -66,5 +86,22 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
     }
 
     return depList;
+  }
+}
+
+class ScopeUtil {
+
+  public Map<String, String> map;
+
+  public ScopeUtil() {
+    map = new HashMap<>();
+    map.put("testImplementation", "test");
+    map.put("runtimeOnly", "runtime");
+    map.put("compileOnly", "compile");
+    map.put("Implementation", "compile");
+  }
+
+  public String getScope(String type) {
+    return map.get(type);
   }
 }

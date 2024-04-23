@@ -29,7 +29,7 @@ public class GradleFileReader implements Function<Path, GradleFile> {
         String group2 = matcher.group(2);
         if (!file.getDep().containsKey(group2)) {
           file.getDep().put(group2, group1);
-        } else if (group1.equals("testImplementation")) {
+        } else if (file.getDep().get(group2).equals("testImplementation")) {
           file.getDep().put(group2, group1);
         } else {
           new RuntimeException("unkown " + group1 + group2);
