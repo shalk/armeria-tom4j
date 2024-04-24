@@ -87,7 +87,7 @@ public class PomFileContentGenerator implements Function<PomFile, String> {
     if (!plugins.isEmpty()) {
       builder.append("<plugins>\n");
       for (String plugin : plugins) {
-        List<String> pluginLine = PluginUtil.getPlugin(plugin);
+        List<String> pluginLine = PluginUtil.getPlugin(pomFile.getA(), plugin);
         pluginLine.forEach(line -> builder.append(line).append("\n"));
       }
       builder.append("</plugins>\n");
@@ -124,7 +124,12 @@ class ExtUtil {
 
 class PluginUtil {
 
-  public static List<String> getPlugin(String name) {
+  public static List<String> getPlugin(String artifactId, String name) {
+    if (artifactId.contains("grpc-scala")) {
+      name = "grpc-scala";
+    } else if (artifactId.contains("grpc-reactor")) {
+      name = "grpc-reactor";
+    }
     try {
       URL url = PluginUtil.class.getClassLoader().getResource("plugin-" + name + ".xml");
       Path path = Paths.get(url.toURI());

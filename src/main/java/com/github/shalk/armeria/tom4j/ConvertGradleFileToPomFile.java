@@ -53,7 +53,24 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
       dep.getExcludes().add("org.springframework.boot:spring-boot-starter-tomcat");
       deps.add(dep);
     }
-
+    if (pomFile.getA().equals("example-dropwizard")) {
+      String version = depStore.getVersion("assertj");
+      Dep dep = new Dep();
+      dep.setVersion(version);
+      dep.setGroup("org.assertj");
+      dep.setArtifact("assertj-core");
+      dep.setScope("test");
+      deps.add(dep);
+    }
+    if (pomFile.getA().equals("example-graphql")) {
+      String version = depStore.getVersion("junit5");
+      Dep dep = new Dep();
+      dep.setVersion(version);
+      dep.setGroup("org.junit.jupiter");
+      dep.setArtifact("junit-jupiter-params");
+      dep.setScope("test");
+      deps.add(dep);
+    }
     pomFile.setDep(deps);
 
     // plugin corner case
@@ -82,6 +99,9 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
       String type = entry.getValue();
       Dep dep = depStore.getDep(lib);
       dep.setScope(scopeUtil.getScope(type));
+      if (lib.equals("libs.javax.annotation")) {
+        dep.setScope("compile");
+      }
       depList.add(dep);
     }
 
