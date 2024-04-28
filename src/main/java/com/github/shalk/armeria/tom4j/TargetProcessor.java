@@ -17,9 +17,16 @@ public class TargetProcessor implements UnaryOperator<Path> {
   @SneakyThrows
   @Override
   public Path apply(Path gradleFIle) {
-    Path parent = gradleFIle.getParent();
-    String targetDir = parent.toString().replaceAll(source, target);
-    FileUtils.forceMkdir(new File(targetDir));
-    return Paths.get(targetDir, "pom.xml");
+    Path targetPom = trans(gradleFIle);
+    FileUtils.forceMkdir(
+        new File(gradleFIle.getParent().toString().replaceAll(this.source, this.target)));
+    return targetPom;
+  }
+
+  Path trans(Path gradleFIle) {
+    Path targetPom =
+        Paths.get(
+            gradleFIle.getParent().toString().replaceAll(this.source, this.target), "pom.xml");
+    return targetPom;
   }
 }
