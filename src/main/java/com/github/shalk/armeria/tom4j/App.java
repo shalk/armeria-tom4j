@@ -13,11 +13,13 @@ public class App {
   public static void main(String[] args) throws IOException, URISyntaxException {
     if (args.length < 1) {
       System.out.println("Usage: armeriaPath");
-      System.out.println("mvn exec:java -Dexec.args=\"/home/user/armeria\"");
+      System.out.println("mvn exec:java -Dexec.args=\"1.27.2 /home/user/armeria /target \"");
       System.exit(1);
     }
-    String armeriaCodeDir = args[0];
-    System.out.println("armeriaCodeDir = " + armeriaCodeDir);
+    String armeriaCodeDir = args[1];
+    String armeriaVersion = args[0];
+    String targetDir = args[2];
+    System.out.println("reading " + armeriaCodeDir);
     Path depTomlPath = Paths.get(armeriaCodeDir, "dependencies.toml");
 
     String path = armeriaCodeDir + "/examples";
@@ -26,7 +28,7 @@ public class App {
     List<Path> gradleList = findFinder.getGradleList(path);
 
     // load dependencies.toml
-    DepStore depstore = new DepStoreImpl(depTomlPath);
+    DepStore depstore = new DepStoreImpl(armeriaVersion, depTomlPath);
 
     for (Path gradleFilePath : gradleList) {
       // read file to as Pojo GradleFile
@@ -43,7 +45,8 @@ public class App {
               .apply(gradleFilePath);
 
       // write to  pom.xml
-      Path pomFilePath = new TargetProcessor().apply(gradleFilePath);
+      Path pomFilePath = new TargetProcessor(armeriaCodeDir, targetDir).apply(gradleFilePath);
+      System.out.println("generating " + pomFilePath);
       Files.write(pomFilePath, pomFileContent.getBytes(StandardCharsets.UTF_8));
     }
   }

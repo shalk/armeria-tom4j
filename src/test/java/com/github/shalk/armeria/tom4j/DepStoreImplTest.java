@@ -11,7 +11,7 @@ class DepStoreImplTest {
   @Test
   public void test() throws IOException, URISyntaxException {
     Path path = Paths.get(ClassLoader.getSystemResource("dependencies.toml").toURI());
-    DepStoreImpl depStore = new DepStoreImpl(path);
+    DepStoreImpl depStore = new DepStoreImpl("1.27.2", path);
     Dep dep = depStore.getDep("libs.assertj");
     String name = new PomFileContentGenerator().depToString(dep);
     System.out.println("name = " + name);

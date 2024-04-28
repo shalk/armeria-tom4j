@@ -88,6 +88,9 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
       pomFile.getPlugin().add("thrift");
     }
 
+    pomFile.getPlugin().add("compiler");
+    pomFile.getPlugin().add("surefire");
+
     return pomFile;
   }
 

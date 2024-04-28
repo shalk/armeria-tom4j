@@ -18,11 +18,12 @@ public class DepStoreImpl implements DepStore {
 
   // key is groupId, value is versionRefKey
   Map<String, String> bomMap;
+  private String armeriaVersion;
 
   @SneakyThrows
-  public DepStoreImpl(Path file) {
-
-    this.result = Toml.parse(file);
+  public DepStoreImpl(String armeriaVersion, Path depfile) {
+    this.armeriaVersion = armeriaVersion;
+    this.result = Toml.parse(depfile);
     this.versionMap = new HashMap<>();
     this.lib = new HashMap<>();
     this.bomMap = new HashMap<>();
@@ -151,7 +152,7 @@ public class DepStoreImpl implements DepStore {
       dep.setArtifact("armeria");
     }
     dep.setGroup("com.linecorp.armeria");
-    dep.setVersion(ArmeriaVersion.version);
+    dep.setVersion(armeriaVersion);
     return dep;
   }
 
