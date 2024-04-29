@@ -74,7 +74,9 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
     pomFile.setDep(deps);
 
     // plugin corner case
-    if (pomFile.getA().contains("grpc")) {
+    if (pomFile.getA().contains("grpc")
+        && !pomFile.getA().equals("grpc-scala")
+        && !pomFile.getA().equals("grpc-reactor")) {
       pomFile.getPlugin().add("grpc");
       pomFile.getExtension().add("os");
       String grpcJavaVersion = depStore.getVersion("grpc-java");
@@ -86,6 +88,13 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
 
     if (pomFile.getA().contains("thrift")) {
       pomFile.getPlugin().add("thrift");
+    }
+    if (pomFile.getA().contains("grpc-scala")) {
+      pomFile.getExtension().add("os");
+      pomFile.getPlugin().add("grpc-scala");
+    } else if (pomFile.getA().contains("grpc-reactor")) {
+      pomFile.getExtension().add("os");
+      pomFile.getPlugin().add("grpc-reactor");
     }
 
     pomFile.getPlugin().add("compiler");

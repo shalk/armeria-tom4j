@@ -22,10 +22,10 @@ public class App {
     System.out.println("reading " + armeriaCodeDir);
     Path depTomlPath = Paths.get(armeriaCodeDir, "dependencies.toml");
 
-    String path = armeriaCodeDir + "/examples";
+    String armeriaCodeExampleDir = armeriaCodeDir + "/examples";
     // find all file
     FindFinder findFinder = new FindFinder();
-    List<Path> gradleList = findFinder.getGradleList(path);
+    List<Path> gradleList = findFinder.getGradleList(armeriaCodeExampleDir);
 
     // load dependencies.toml
     DepStore depstore = new DepStoreImpl(armeriaVersion, depTomlPath);
@@ -45,7 +45,8 @@ public class App {
               .apply(gradleFilePath);
 
       // write to  pom.xml
-      Path pomFilePath = new TargetProcessor(armeriaCodeDir, targetDir).apply(gradleFilePath);
+      Path pomFilePath =
+          new TargetProcessor(armeriaCodeExampleDir, targetDir).apply(gradleFilePath);
       System.out.println("generating " + pomFilePath);
       Files.write(pomFilePath, pomFileContent.getBytes(StandardCharsets.UTF_8));
     }

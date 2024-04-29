@@ -1,15 +1,13 @@
 /* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
 
-import java.net.URL;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.apache.commons.io.IOUtils;
 
 public class PomFileContentGenerator implements Function<PomFile, String> {
 
@@ -87,7 +85,7 @@ public class PomFileContentGenerator implements Function<PomFile, String> {
     if (!plugins.isEmpty()) {
       builder.append("<plugins>\n");
       for (String plugin : plugins) {
-        List<String> pluginLine = PluginUtil.getPlugin(pomFile.getA(), plugin);
+        List<String> pluginLine = PluginUtil.getPlugin(plugin);
         pluginLine.forEach(line -> builder.append(line).append("\n"));
       }
       builder.append("</plugins>\n");
@@ -111,10 +109,9 @@ public class PomFileContentGenerator implements Function<PomFile, String> {
 class ExtUtil {
 
   public static List<String> getExt(String name) {
-    try {
-      URL url = ExtUtil.class.getClassLoader().getResource("ext-" + name + ".xml");
-      Path path = Paths.get(url.toURI());
-      return Files.readAllLines(path, StandardCharsets.UTF_8);
+    try (InputStream in =
+        ExtUtil.class.getClassLoader().getResourceAsStream("ext-" + name + ".xml")) {
+      return IOUtils.readLines(in, StandardCharsets.UTF_8);
     } catch (Exception e) {
       e.printStackTrace();
       return new ArrayList<>();
@@ -124,16 +121,10 @@ class ExtUtil {
 
 class PluginUtil {
 
-  public static List<String> getPlugin(String artifactId, String name) {
-    if (artifactId.contains("grpc-scala")) {
-      name = "grpc-scala";
-    } else if (artifactId.contains("grpc-reactor")) {
-      name = "grpc-reactor";
-    }
-    try {
-      URL url = PluginUtil.class.getClassLoader().getResource("plugin-" + name + ".xml");
-      Path path = Paths.get(url.toURI());
-      return Files.readAllLines(path, StandardCharsets.UTF_8);
+  public static List<String> getPlugin(String name) {
+    try (InputStream in =
+        ExtUtil.class.getClassLoader().getResourceAsStream("plugin-" + name + ".xml")) {
+      return IOUtils.readLines(in, StandardCharsets.UTF_8);
     } catch (Exception e) {
       e.printStackTrace();
       return new ArrayList<>();

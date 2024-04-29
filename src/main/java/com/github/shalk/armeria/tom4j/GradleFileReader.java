@@ -1,27 +1,32 @@
 /* Licensed under Apache-2.0 2024. */
 package com.github.shalk.armeria.tom4j;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.SneakyThrows;
 
 public class GradleFileReader implements Function<Path, GradleFile> {
-  static String rex = "^\\s*(implementation|runtimeOnly|testImplementation|compileOnly)\\s+(\\S+)";
+  static String rex = "^\\s*(implementation|runtimeOnly|testImplementation|compileOnly|annotationProcessor)\\s+(\\S+)";
   static String rex2 =
-      "^\\s*(implementation|runtimeOnly|testImplementation|compileOnly)\\((\\S+)\\)";
+      "^\\s*(implementation|runtimeOnly|testImplementation|compileOnly|annotationProcessor)\\((\\S+)\\)";
 
   static Pattern p = Pattern.compile(rex);
   static Pattern p2 = Pattern.compile(rex2);
 
-  @SneakyThrows
   public GradleFile apply(Path path) {
     GradleFile file = new GradleFile();
     file.setFilename(path.toString());
-    List<String> lines = Files.readAllLines(path);
+    List<String> lines = null;
+    try {
+      lines = Files.readAllLines(path);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
     for (String line : lines) {
       Matcher matcher = p.matcher(line);
       if (matcher.matches()) {
