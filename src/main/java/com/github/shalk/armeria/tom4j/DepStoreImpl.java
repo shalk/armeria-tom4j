@@ -110,28 +110,23 @@ public class DepStoreImpl implements DepStore {
 
   @Override
   public Dep getDep(String name) {
-    Dep dep1 = getDep1(name);
-    if (dep1 == null) {
+    Dep ret = null;
+    if (name.startsWith("libs")) {
+      ret = getDepByLibName(name);
+    } else if (name.startsWith("project")) {
+      ret = getDepByProjectName(name);
+    } else if (name.startsWith("kotlin")) {
+      ret = getDepByKotlinName(name);
+    }
+    if (ret == null) {
       throw new RuntimeException("can not handle dep " + name);
     }
-    return dep1;
+    return ret;
   }
 
   @Override
   public String getVersion(String name) {
     return versionMap.get(name);
-  }
-
-  private Dep getDep1(String name) {
-    if (name.startsWith("libs")) {
-      return getDepByLibName(name);
-    } else if (name.startsWith("project")) {
-      return getDepByProjectName(name);
-    } else if (name.startsWith("kotlin")) {
-      return getDepByKotlinName(name);
-    } else {
-      throw new RuntimeException("unkown dep type name");
-    }
   }
 
   public Dep getDepByLibName(String name) {
