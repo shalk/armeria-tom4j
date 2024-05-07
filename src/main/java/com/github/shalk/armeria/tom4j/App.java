@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Function;
+import java.util.logging.XMLFormatter;
 
 public class App {
   public static void main(String[] args) throws IOException, URISyntaxException {
@@ -38,10 +40,12 @@ public class App {
           new ConvertGradleFileToPomFile(depstore);
       // generate pom.xml from pomFile
       PomFileContentGenerator pomFileContentGenerator = new PomFileContentGenerator();
+      XmlFormat xmlFormat = new XmlFormat();
       String pomFileContent =
           gradleFileReader
               .andThen(convertGradleFileToPomFile)
               .andThen(pomFileContentGenerator)
+              .andThen(xmlFormat)
               .apply(gradleFilePath);
 
       // write to  pom.xml
