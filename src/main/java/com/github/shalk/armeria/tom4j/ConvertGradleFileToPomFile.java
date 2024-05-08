@@ -62,6 +62,44 @@ public class ConvertGradleFileToPomFile implements Function<GradleFile, PomFile>
       dep.setScope("test");
       deps.add(dep);
     }
+
+    if (pomFile.getA().equals("example-dropwizard")) {
+      String version = depStore.getVersion("junit5");
+      Dep dep = new Dep();
+      dep.setVersion(version);
+      dep.setGroup("org.junit.jupiter");
+      dep.setArtifact("junit-jupiter");
+      dep.setScope("test");
+      deps.add(dep);
+    }
+    if (pomFile.getA().equals("example-spring-boot-jetty")) {
+      String version = depStore.getVersion("jetty12");
+      Dep dep = new Dep();
+      dep.setVersion("12.0.7");
+      dep.setGroup("org.eclipse.jetty");
+      dep.setArtifact("jetty-server");
+      deps.add(dep);
+    }
+
+    if (pomFile.getA().equals("example-dropwizard")) {
+      String version = depStore.getVersion("junit5");
+      Dep dep = new Dep();
+      dep.setVersion(version);
+      dep.setGroup("org.junit.jupiter");
+      dep.setArtifact("junit-jupiter");
+      dep.setScope("test");
+      deps.add(dep);
+    }
+    if (pomFile.getA().equals("example-spring-boot-minimal") ||pomFile.getA().equals("example-spring-boot-tomcat")
+        ||  pomFile.getA().equals("example-spring-boot-webflux") ) {
+      String version = depStore.getVersion("slf4j2");
+      Dep dep = new Dep();
+      dep.setVersion(version);
+      dep.setGroup("org.slf4j");
+      dep.setArtifact("slf4j-api");
+      deps.add(dep);
+    }
+
     if (pomFile.getA().equals("example-graphql")) {
       String version = depStore.getVersion("junit5");
       Dep dep = new Dep();
