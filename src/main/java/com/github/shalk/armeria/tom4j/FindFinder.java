@@ -21,7 +21,7 @@ public class FindFinder {
             new BiPredicate<Path, BasicFileAttributes>() {
               @Override
               public boolean test(Path path, BasicFileAttributes basicFileAttributes) {
-                return path.endsWith("build.gradle") && !path.getParent().endsWith("-scala") && !path.getParent().endsWith("-sangria");
+                return path.endsWith("build.gradle") && !path.getParent().toString().endsWith("-scala") && !path.getParent().toString().endsWith("-sangria");
               }
             });
     return pathStream.collect(Collectors.toList());
